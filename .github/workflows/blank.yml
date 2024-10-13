@@ -1,0 +1,43 @@
+name: Push Build to Artifactory
+
+
+on: [push]
+
+
+jobs:
+ build:
+   runs-on: ubuntu-latest
+  
+   steps:
+   # This action checks out the code from the repository
+   - name: Checkout Code
+     uses: actions/checkout@v2
+
+
+   # This action sets up the JFrog CLI with Artifactory URL and    a predefined Artifactory oidc integration name
+   - uses: jfrog/setup-jfrog-cli@v4
+     with:
+          oidc-provider-name: ronma-test
+     env:
+       JF_URL: https://elinaf.jfrog.io 
+
+   # This action creates a new test file and uploads it to Artifactory, if build_name and build_number are omitted GitHub run default are used     
+   - name: Push Build to Artifactory
+     run: |
+       echo "test file " > test.txt
+       export BUILD_NAME="my-build"
+       export BUILD_MODULE="my-module"
+       export BUILD_NUMBER="1"
+
+
+       export PATH_TO_DIRECTORY="name/version/dates"
+      
+       jf rt upload "test.txt" ronma-libs-release --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
+
+
+   # This action publishes the build information to Artifactory and deletes older builds
+   - name: Build to Artifactory
+     run: |
+       jf rt build-publish $BUILD_NAME $BUILD_NUMBER
+     
+       jf rt bdi c --max-builds=1
