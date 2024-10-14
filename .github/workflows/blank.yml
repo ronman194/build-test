@@ -19,7 +19,7 @@ jobs:
    # This action sets up the JFrog CLI with Artifactory URL and    a predefined Artifactory oidc integration name
    - uses: jfrog/setup-jfrog-cli@v4
      with:
-          oidc-provider-name: ronma-test
+       oidc-provider-name: ronma-test
      env:
        JF_URL: https://elinaf.jfrog.io 
 
